@@ -153,21 +153,21 @@ func FromEnv(config *Config) error {
 
 	objectsTtlConcurrencyFactorEnv := "OBJECTS_TTL_CONCURRENCY_FACTOR"
 	if err := parsePositiveFloat(objectsTtlConcurrencyFactorEnv,
-		func(val float64) { config.ObjectsTTLConcurrencyFactor = val },
+		func(val float64) { config.ObjectsTTLConcurrencyFactor = configRuntime.NewDynamicValue(val) },
 		DefaultObjectsTTLConcurrencyFactor); err != nil {
 		return fmt.Errorf("%s: %w", objectsTtlConcurrencyFactorEnv, err)
 	}
 
 	objectsTtlFindBatchSizeEnv := "OBJECTS_TTL_FIND_BATCH_SIZE"
 	if err := parsePositiveInt(objectsTtlFindBatchSizeEnv,
-		func(val int) { config.ObjectsTTLFindBatchSize = val },
+		func(val int) { config.ObjectsTTLFindBatchSize = configRuntime.NewDynamicValue(val) },
 		DefaultObjectsTTLFindBatchSize); err != nil {
 		return fmt.Errorf("%s: %w", objectsTtlFindBatchSizeEnv, err)
 	}
 
 	objectsTtlDeleteBatchSizeEnv := "OBJECTS_TTL_DELETE_BATCH_SIZE"
 	if err := parsePositiveInt(objectsTtlDeleteBatchSizeEnv,
-		func(val int) { config.ObjectsTTLDeleteBatchSize = val },
+		func(val int) { config.ObjectsTTLDeleteBatchSize = configRuntime.NewDynamicValue(val) },
 		DefaultObjectsTTLDeleteBatchSize); err != nil {
 		return fmt.Errorf("%s: %w", objectsTtlDeleteBatchSizeEnv, err)
 	}

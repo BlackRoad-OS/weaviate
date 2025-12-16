@@ -51,6 +51,10 @@ type WeaviateRuntimeConfig struct {
 	OperationalMode                      *runtime.DynamicValue[string]        `json:"operational_mode" yaml:"operational_mode"`
 	DefaultQuantization                  *runtime.DynamicValue[string]        `yaml:"default_quantization" json:"default_quantization"`
 
+	ObjectsTTLFindBatchSize     *runtime.DynamicValue[int]     `json:"objects_ttl_find_batch_size" yaml:"objects_ttl_find_batch_size"`
+	ObjectsTTLDeleteBatchSize   *runtime.DynamicValue[int]     `json:"objects_ttl_delete_batch_size" yaml:"objects_ttl_delete_batch_size"`
+	ObjectsTTLConcurrencyFactor *runtime.DynamicValue[float64] `json:"objects_ttl_concurrency_factor" yaml:"objects_ttl_concurrency_factor"`
+
 	// RAFT specific configs
 	RaftDrainSleep        *runtime.DynamicValue[time.Duration] `json:"raft_drain_sleep" yaml:"raft_drain_sleep"`
 	RaftTimoutsMultiplier *runtime.DynamicValue[int]           `json:"raft_timeouts_multiplier" yaml:"raft_timeouts_multiplier"`
