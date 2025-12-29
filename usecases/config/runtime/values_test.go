@@ -261,9 +261,9 @@ func TestDynamicValue_Validation(t *testing.T) {
 		return nil
 	}
 
-	floatValid := float64(1)
-	floatValid2 := float64(2)
-	floatInvalid := float64(-1)
+	floatValid := 1.
+	floatValid2 := 2.
+	floatInvalid := -1.
 	floatValidate := func(val float64) error {
 		if val < 0 {
 			return fmt.Errorf("float < 0")
