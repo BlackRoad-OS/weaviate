@@ -192,10 +192,17 @@ func FromEnv(config *Config) error {
 		if config.ObjectsTTLAllowSeconds {
 			parser = cron.SecondsParser()
 		}
-		if _, err := parser.Parse(objectsTtlDeleteSchedule); err != nil {
-			return fmt.Errorf("%s: %w", objectsTtlDeleteScheduleEnv, err)
+		validate := func(val string) error {
+			if _, err := parser.Parse(val); err != nil {
+				return err
+			}
+			return nil
 		}
-		config.ObjectsTTLDeleteSchedule = objectsTtlDeleteSchedule
+		if dv, err := configRuntime.NewDynamicValueWithValidation(objectsTtlDeleteSchedule, validate); err != nil {
+			return fmt.Errorf("%s: %w", objectsTtlDeleteScheduleEnv, err)
+		} else {
+			config.ObjectsTTLDeleteSchedule = dv
+		}
 	}
 
 	cptParser := newCollectionPropsTenantsParser()
