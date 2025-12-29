@@ -831,7 +831,8 @@ type IndexConfig struct {
 	TrackVectorDimensionsInterval       time.Duration
 	UsageEnabled                        bool
 	ShardLoadLimiter                    ShardLoadLimiter
-	ObjectsTTLBatchSize                 int
+	ObjectsTTLFindBatchSize             int
+	ObjectsTTLDeleteBatchSize           int
 
 	HNSWMaxLogSize                               int64
 	HNSWDisableSnapshots                         bool
@@ -2223,14 +2224,12 @@ func (i *Index) incomingDeleteObjectsExpired(ctx context.Context, eg *enterrors.
 		},
 	}}
 
-	// TODO aliszka:ttl configurable
-	perShardLimit := 25_000
-
 	// the replication properties determine how aggressive the errors are returned and does not change anything about
 	// the server's behaviour. Therefore, we set it to QUORUM to be able to log errors in case the deletion does not
 	// succeed on too many nodes. In the case of errors a node might retain the object past its TTL. However, when the
 	// deletion process happens to run on that node again, the object will be deleted then.
 	replProps := defaultConsistency()
+	perShardLimit := i.Config.ObjectsTTLFindBatchSize
 
 	if multitenancy.IsMultiTenant(class.MultiTenancyConfig) {
 		tenants, err := i.schemaReader.Shards(class.Class)
@@ -2388,7 +2387,7 @@ func (i *Index) incomingDeleteObjectsExpiredUuids(ctx context.Context, eg *enter
 		return nil
 	}
 
-	batchSize := i.Config.ObjectsTTLBatchSize
+	batchSize := i.Config.ObjectsTTLDeleteBatchSize
 	for i := 0; i*batchSize < uuidsCount; i++ {
 		if err := ctx.Err(); err != nil {
 			ec.AddGroups(err, collection, inputKey)
