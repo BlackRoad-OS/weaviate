@@ -164,7 +164,7 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 				sv.Reset()
 			} else {
 				p := pi.(*runtime.DynamicValue[int])
-				sv.SetValue(p.Get())
+				r.err = sv.SetValue(p.Get())
 			}
 			r.newV = sv.Get()
 		case *runtime.DynamicValue[float64]:
@@ -174,7 +174,7 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 				sv.Reset()
 			} else {
 				p := pi.(*runtime.DynamicValue[float64])
-				sv.SetValue(p.Get())
+				r.err = sv.SetValue(p.Get())
 			}
 			r.newV = sv.Get()
 		case *runtime.DynamicValue[bool]:
@@ -184,7 +184,7 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 				sv.Reset()
 			} else {
 				p := pi.(*runtime.DynamicValue[bool])
-				sv.SetValue(p.Get())
+				r.err = sv.SetValue(p.Get())
 			}
 			r.newV = sv.Get()
 		case *runtime.DynamicValue[time.Duration]:
@@ -194,7 +194,7 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 				sv.Reset()
 			} else {
 				p := pi.(*runtime.DynamicValue[time.Duration])
-				sv.SetValue(p.Get())
+				r.err = sv.SetValue(p.Get())
 			}
 			r.newV = sv.Get()
 		case *runtime.DynamicValue[string]:
@@ -204,7 +204,7 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 				sv.Reset()
 			} else {
 				p := pi.(*runtime.DynamicValue[string])
-				sv.SetValue(p.Get())
+				r.err = sv.SetValue(p.Get())
 			}
 			r.newV = sv.Get()
 		case *runtime.DynamicValue[[]string]:
@@ -214,27 +214,32 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 				sv.Reset()
 			} else {
 				p := pi.(*runtime.DynamicValue[[]string])
-				sv.SetValue(p.Get())
+				r.err = sv.SetValue(p.Get())
 			}
 			r.newV = sv.Get()
 		default:
 			panic(fmt.Sprintf("not recognized type: %#v, %#v", pi, si))
 		}
 
-		if !reflect.DeepEqual(r.newV, r.oldV) {
+		if r.err != nil || !reflect.DeepEqual(r.newV, r.oldV) {
 			logRecords = append(logRecords, r)
 		}
 
 	}
 
 	// log the changes made as INFO for auditing.
-	for _, v := range logRecords {
-		log.WithFields(logrus.Fields{
+	for _, r := range logRecords {
+		logger := log.WithFields(logrus.Fields{
 			"action":    "runtime_overrides_changed",
-			"field":     v.field,
-			"old_value": v.oldV,
-			"new_value": v.newV,
-		}).Infof("runtime overrides: config '%v' changed from '%v' to '%v'", v.field, v.oldV, v.newV)
+			"field":     r.field,
+			"old_value": r.oldV,
+		})
+
+		if r.err != nil {
+			logger.WithError(r.err).Errorf("runtime overrides: config '%v' change failed", r.field)
+			continue
+		}
+		logger.WithField("new_value", r.newV).Infof("runtime overrides: config '%v' changed from '%v' to '%v'", r.field, r.oldV, r.newV)
 	}
 
 	for match, f := range hooks {
@@ -258,6 +263,7 @@ func updateRuntimeConfig(log logrus.FieldLogger, source, parsed reflect.Value, h
 // updateLogRecord is used to record changes during updating runtime config.
 type updateLogRecord struct {
 	field      string
+	err        error
 	oldV, newV any
 }
 
