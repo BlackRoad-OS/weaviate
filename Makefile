@@ -99,7 +99,7 @@ local-rbac: ## Run the local development setup on single node with rbac enabled
 debug: ## Connect local weaviate server via delv for debugging
 	./tools/dev/run_dev_server.sh debug
 
-banner: ## Add Weaviate banner with license details
+banner: ## Add BlackRoad OS banner with license details
 	./tools/gen-code-from-swagger.sh
 
 .PHONY: mocks

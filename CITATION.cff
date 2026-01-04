@@ -1,8 +1,10 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "Weaviate"
-url: "https://github.com/weaviate/weaviate"
+title: "BlackRoad OS Vector Database"
+url: "https://github.com/BlackRoad-OS/weaviate"
 authors:
+- family-names: "BlackRoad OS"
+  given-names: "Inc."
 - family-names: "Dilocker"
   given-names: "Etienne"
 - family-names: "van Luijt"
