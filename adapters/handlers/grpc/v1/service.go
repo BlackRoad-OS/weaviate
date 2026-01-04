@@ -268,6 +268,7 @@ func (s *Service) BatchStream(stream pb.Weaviate_BatchStreamServer) error {
 	return s.batchStreamHandler.Handle(stream)
 }
 
+// Search is the entrypoint for gRPC searches.
 func (s *Service) Search(ctx context.Context, req *pb.SearchRequest) (*pb.SearchReply, error) {
 	var result *pb.SearchReply
 	var errInner error
