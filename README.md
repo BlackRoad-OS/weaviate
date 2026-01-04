@@ -24,7 +24,7 @@ Create a `docker-compose.yml` file:
 
 ```yml
 services:
-  blackroad-vector-db:
+  blackroad-os-vector-db:
     image: cr.weaviate.io/semitechnologies/weaviate:1.32.2
     ports:
       - "8080:8080"
