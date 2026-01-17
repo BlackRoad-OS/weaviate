@@ -112,6 +112,7 @@ func (db *DB) SparseObjectSearch(ctx context.Context, params dto.GetParams) ([]*
 	return res, scores, nil
 }
 
+// Search returns Results for the given params with references enriched. Performs an inverted index search.
 func (db *DB) Search(ctx context.Context, params dto.GetParams) ([]search.Result, error) {
 	start := time.Now()
 	defer func() {
